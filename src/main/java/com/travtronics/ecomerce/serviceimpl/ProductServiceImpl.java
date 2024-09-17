@@ -5,8 +5,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.travtronics.ecomerce.dto.ProductDTO;
+import com.travtronics.ecomerce.appconstants.EcommerceConstants;
 import com.travtronics.ecomerce.entity.Product;
+import com.travtronics.ecomerce.globalexceptionhandle.IdNotFoundException;
 import com.travtronics.ecomerce.repository.ProductRepository;
 import com.travtronics.ecomerce.service.ProductService;
 
@@ -24,35 +25,35 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	@Transactional
-	public Product createProduct(Product product) throws Exception {
+	public Product createProduct(Product product) throws IdNotFoundException {
 		if (product != null) {
 			return productRepository.save(product);
 
 		}
-		throw new Exception("Product is null and cannot be created.");
+		throw new IdNotFoundException("Product Is Null And Cannot Be Created.");
 	}
 
 	@Override
 	@Transactional
-	public Product updateProduct(Long id, ProductDTO productDTO) throws Exception {
-		Product product = getProductById(id);
-		product.setName(productDTO.getName());
-		product.setCategory(productDTO.getCategory());
-		product.setDescription(productDTO.getDescription());
-		product.setPrice(productDTO.getPrice());
-		product.setStockQuantity(productDTO.getStockQuantity());
-		return productRepository.save(product);
+	public Product updateProduct(Long id, Product product) throws IdNotFoundException {
+		Product exsitProduct = getProductById(id);
+		exsitProduct.setName(product.getName());
+		exsitProduct.setCategory(product.getCategory());
+		exsitProduct.setDescription(product.getDescription());
+		exsitProduct.setPrice(product.getPrice());
+		exsitProduct.setStockQuantity(product.getStockQuantity());
+		return productRepository.save(exsitProduct);
 	}
 
 	@Override
-	public Product getProductById(Long id) throws Exception {
+	public Product getProductById(Long id) throws IdNotFoundException {
 
 		Optional<Product> findById = productRepository.findById(id);
 		if (findById.isPresent()) {
 			return findById.get();
 
 		}
-		throw new Exception("No Product :" + id);
+		throw new IdNotFoundException(EcommerceConstants.PRODUCT_ID_NOT_FOUND + id);
 	}
 
 	@Override
@@ -62,13 +63,13 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	@Transactional
-	public Boolean deleteProduct(Long id) throws Exception {
+	public Boolean deleteProduct(Long id) throws IdNotFoundException {
 		Optional<Product> findById = productRepository.findById(id);
 		if (findById.isPresent()) {
 			productRepository.deleteById(id);
 			return true;
 		}
-		throw new Exception("Id Not Found :" + id);
+		throw new IdNotFoundException(EcommerceConstants.PRODUCT_ID_NOT_FOUND + id);
 	}
 
 	@Override

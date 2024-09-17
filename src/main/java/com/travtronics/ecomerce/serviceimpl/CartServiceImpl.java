@@ -4,11 +4,14 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.travtronics.ecomerce.appconstants.EcommerceConstants;
 import com.travtronics.ecomerce.dto.CartItemDTO;
 import com.travtronics.ecomerce.entity.Cart;
 import com.travtronics.ecomerce.entity.CartItem;
 import com.travtronics.ecomerce.entity.Product;
 import com.travtronics.ecomerce.entity.User;
+import com.travtronics.ecomerce.globalexceptionhandle.IdNotFoundException;
+import com.travtronics.ecomerce.globalexceptionhandle.ItemAddFaildException;
 import com.travtronics.ecomerce.repository.CartRepository;
 import com.travtronics.ecomerce.service.CartService;
 import com.travtronics.ecomerce.service.ProductService;
@@ -26,18 +29,18 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public Cart getCartByUserId(Long userId) throws Exception
+	public Cart getCartByUserId(Long userId) throws IdNotFoundException
 	{
 		Optional<Cart> findById = cartRepository.findById(userId);
 		if(findById.isPresent())
 		{
 			return findById.get();
 		}
-		throw new Exception("User Id Not FOund :"+userId);
+		throw new IdNotFoundException(EcommerceConstants.USER_ID_NOT_FOUND+userId);
 	}
 
 	@Override
-	public Cart addItemToCart(Long userId, CartItemDTO cartItemDTO) throws Exception {
+	public Cart addItemToCart(Long userId, CartItemDTO cartItemDTO) throws ItemAddFaildException {
 		Optional<Cart> cartOptional = cartRepository.findByUserId(userId);
 
 		// Get the product from the product service

@@ -35,6 +35,8 @@ public class User {
 	@Column(insertable = false)
 	private LocalDate updatedDate;
 
+	public User() {
+	}
 	public User(Long userId) {
 	}
 

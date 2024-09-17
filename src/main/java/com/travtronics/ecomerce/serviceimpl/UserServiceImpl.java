@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.travtronics.ecomerce.appconstants.EcommerceConstants;
 import com.travtronics.ecomerce.entity.User;
+import com.travtronics.ecomerce.globalexceptionhandle.IdNotFoundException;
 import com.travtronics.ecomerce.repository.UserRepository;
 import com.travtronics.ecomerce.service.UserService;
 
@@ -27,12 +29,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User getUserById(Long id) throws Exception {
+	public User getUserById(Long id) throws IdNotFoundException {
 		Optional<User> findById = userRepository.findById(id);
 		if (findById.isPresent()) {
 			return findById.get();
 		}
-		throw new Exception("Id Not Found :" + id);
+		throw new IdNotFoundException(EcommerceConstants.USER_ID_NOT_FOUND + id);
 	}
 
 	@Override
@@ -41,15 +43,16 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User updateUserById(Long id, User user) throws Exception {
+	public User updateUserById(Long id, User user) throws IdNotFoundException {
 		if (userRepository.existsById(id)) {
-			User existingUser = userRepository.findById(id).orElseThrow(() -> new Exception("Id Not Found :" + id));
+			User existingUser = userRepository.findById(id)
+					.orElseThrow(() -> new IdNotFoundException("Id Not Found :" + id));
 			existingUser.setUsername(user.getUsername());
 			existingUser.setPassword(user.getPassword());
 			existingUser.setRole(user.getRole());
 			return userRepository.save(existingUser);
 		} else {
-			throw new Exception("Id Not Found :" + id);
+			throw new IdNotFoundException(EcommerceConstants.USER_ID_NOT_FOUND + id);
 		}
 	}
 
@@ -61,14 +64,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Boolean deleteUserById(Long id) throws Exception
-	{
+	public Boolean deleteUserById(Long id) throws IdNotFoundException {
 		Optional<User> findById = userRepository.findById(id);
-		if(findById.isPresent())
-		{
+		if (findById.isPresent()) {
 			userRepository.deleteById(id);
 		}
-		throw new Exception("Id Not Found Exception");
+		throw new IdNotFoundException(EcommerceConstants.USER_ID_NOT_FOUND + id);
 	}
 
 }
